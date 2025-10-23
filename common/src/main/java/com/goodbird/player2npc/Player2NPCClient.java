@@ -14,7 +14,9 @@ import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.minecraft.client.KeyMapping;
-// import com.player2.playerengine.PlayerEngineClient;
+import net.minecraft.network.chat.Component;
+
+import com.player2.playerengine.PlayerEngineClient;
 
 public class Player2NPCClient {
     private static KeyMapping openCharacterScreenKeybind;
@@ -43,6 +45,8 @@ public class Player2NPCClient {
             }
             if (ttsEnableKeybind.consumeClick()) {
                 PlayerEngineClient.enabledTTS = !PlayerEngineClient.enabledTTS;
+                client.player.sendSystemMessage(
+                        Component.literal(PlayerEngineClient.enabledTTS ? "Enabled TTS" : "Disabled TTS"));
             }
         });
     }
