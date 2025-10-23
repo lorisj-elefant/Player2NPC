@@ -14,9 +14,11 @@ import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.minecraft.client.KeyMapping;
+// import com.player2.playerengine.PlayerEngineClient;
 
 public class Player2NPCClient {
     private static KeyMapping openCharacterScreenKeybind;
+    private static KeyMapping ttsEnableKeybind;
     private static long lastHeartbeatTime = System.nanoTime();
 
     public Player2NPCClient() {
@@ -24,12 +26,23 @@ public class Player2NPCClient {
 
     public static void onInitializeClient() {
         EntityRendererRegistry.register(Player2NPC.AUTOMATONE, RenderAutomaton::new);
-        NetworkManager.registerReceiver(NetworkManager.Side.S2C, Player2NPC.SPAWN_PACKET_ID, AutomatonSpawnPacket::handle);
-        openCharacterScreenKeybind = new KeyMapping("key.player2npc.open_character_screen", Type.KEYSYM, 72, "category.player2npc.keys");
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C, Player2NPC.SPAWN_PACKET_ID,
+                AutomatonSpawnPacket::handle);
+        // https://www.glfw.org/docs/3.3/group__keys.html
+        // 72 => H
+        openCharacterScreenKeybind = new KeyMapping("key.player2npc.open_character_screen", Type.KEYSYM, 72,
+                "category.player2npc.keys");
+        // 79 => O
+        ttsEnableKeybind = new KeyMapping("key.player2npc.tts_toggle", Type.KEYSYM, 79,
+                "category.player2npc.keys");
         KeyMappingRegistry.register(openCharacterScreenKeybind);
+        KeyMappingRegistry.register(ttsEnableKeybind);
         ClientTickEvent.CLIENT_POST.register((client) -> {
             if (openCharacterScreenKeybind.consumeClick() && client.level != null) {
                 client.setScreen(new CharacterSelectionScreen());
+            }
+            if (ttsEnableKeybind.consumeClick()) {
+                PlayerEngineClient.enabledTTS = !PlayerEngineClient.enabledTTS;
             }
         });
     }
