@@ -46,7 +46,8 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInventoryProvider, IInteractionManagerProvider, IHungerManagerProvider {
+public class AutomatoneEntity extends LivingEntity
+        implements IAutomatone, IInventoryProvider, IInteractionManagerProvider, IHungerManagerProvider {
     public LivingEntityInteractionManager manager;
     public LivingEntityInventory inventory;
     public LivingEntityHungerManager hungerManager;
@@ -54,7 +55,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
     public Character character;
     public ResourceLocation textureLocation;
     protected Vec3 lastVelocity;
-    private final String PLAYER2_GAME_ID = "player2-ai-npc-minecraft";
+    public static final String PLAYER2_GAME_ID = "player2-ai-npc-minecraft";
 
     public AutomatoneEntity(EntityType<? extends AutomatoneEntity> type, Level world) {
         super(type, world);
@@ -62,13 +63,14 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
     }
 
     public void init() {
-//        this.setMaxUpStep(0.6F);
+        // this.setMaxUpStep(0.6F);
         this.setSpeed(0.4F);
         this.manager = new LivingEntityInteractionManager(this);
         this.inventory = new LivingEntityInventory(this);
         this.hungerManager = new LivingEntityHungerManager();
         if (!this.level().isClientSide && this.character != null) {
-            this.controller = new PlayerEngineController((IBaritone)IBaritone.KEY.get(this), this.character, "player2-ai-npc-minecraft");
+            this.controller = new PlayerEngineController((IBaritone) IBaritone.KEY.get(this), this.character,
+                    "player2-ai-npc-minecraft");
             ConversationManager.sendGreeting(this.controller, this.character);
         }
 
@@ -106,7 +108,8 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
             CompoundTag compound = tag.getCompound("character");
             this.character = CharacterUtils.readFromNBT(compound);
             if (this.controller == null) {
-                this.controller = new PlayerEngineController((IBaritone)IBaritone.KEY.get(this), this.character, "player2-ai-npc-minecraft");
+                this.controller = new PlayerEngineController((IBaritone) IBaritone.KEY.get(this), this.character,
+                        "player2-ai-npc-minecraft");
             }
 
             ConversationManager.sendGreeting(this.controller, this.character);
@@ -151,10 +154,12 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
     }
 
     public void pickupItems() {
-        if (!this.level().isClientSide && this.isAlive() && !this.dead && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (!this.level().isClientSide && this.isAlive() && !this.dead
+                && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
             Vec3i vec3i = new Vec3i(3, 3, 3);
 
-            for(ItemEntity itemEntity : this.level().getEntitiesOfClass(ItemEntity.class, this.getBoundingBox().inflate((double)vec3i.getX(), (double)vec3i.getY(), (double)vec3i.getZ()))) {
+            for (ItemEntity itemEntity : this.level().getEntitiesOfClass(ItemEntity.class, this.getBoundingBox()
+                    .inflate((double) vec3i.getX(), (double) vec3i.getY(), (double) vec3i.getZ()))) {
                 if (!itemEntity.isRemoved() && !itemEntity.getItem().isEmpty() && !itemEntity.hasPickUpDelay()) {
                     ItemStack itemStack = itemEntity.getItem();
                     int i = itemStack.getCount();
@@ -172,7 +177,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
     }
 
     public boolean doHurtTarget(Entity entity) {
-        float f = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        float f = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE);
         DamageSource damageSource = this.damageSources().mobAttack(this);
         Level l = this.level();
         if (l instanceof ServerLevel serverLevel) {
@@ -183,14 +188,15 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         if (bl) {
             float g = this.getKnockback(entity, damageSource);
             if (g > 0.0F && entity instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity)entity;
-                livingEntity.knockback((double)(g * 0.5F), (double)Mth.sin(this.getYRot() * ((float)Math.PI / 180F)), (double)(-Mth.cos(this.getYRot() * ((float)Math.PI / 180F))));
-                this.setDeltaMovement(this.getDeltaMovement().multiply(0.6, (double)1.0F, 0.6));
+                LivingEntity livingEntity = (LivingEntity) entity;
+                livingEntity.knockback((double) (g * 0.5F), (double) Mth.sin(this.getYRot() * ((float) Math.PI / 180F)),
+                        (double) (-Mth.cos(this.getYRot() * ((float) Math.PI / 180F))));
+                this.setDeltaMovement(this.getDeltaMovement().multiply(0.6, (double) 1.0F, 0.6));
             }
 
             Level var7 = this.level();
             if (var7 instanceof ServerLevel) {
-                ServerLevel serverLevel2 = (ServerLevel)var7;
+                ServerLevel serverLevel2 = (ServerLevel) var7;
                 EnchantmentHelper.doPostAttackEffects(serverLevel2, entity, damageSource);
             }
 
@@ -219,9 +225,10 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         if (slot == EquipmentSlot.MAINHAND) {
             return this.inventory.getMainHandStack();
         } else if (slot == EquipmentSlot.OFFHAND) {
-            return (ItemStack)this.inventory.offHand.get(0);
+            return (ItemStack) this.inventory.offHand.get(0);
         } else {
-            return slot.getType() == Type.HUMANOID_ARMOR ? (ItemStack)this.inventory.armor.get(slot.getIndex()) : ItemStack.EMPTY;
+            return slot.getType() == Type.HUMANOID_ARMOR ? (ItemStack) this.inventory.armor.get(slot.getIndex())
+                    : ItemStack.EMPTY;
         }
     }
 
@@ -245,7 +252,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
     }
 
     public Vec3 lerpVelocity(float delta) {
-        return this.lastVelocity.lerp(this.getDeltaMovement(), (double)delta);
+        return this.lastVelocity.lerp(this.getDeltaMovement(), (double) delta);
     }
 
     @Override
@@ -254,6 +261,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
     }
 
     public Component getDisplayName() {
-        return (Component)(this.character == null ? super.getDisplayName() : Component.literal(this.character.shortName()));
+        return (Component) (this.character == null ? super.getDisplayName()
+                : Component.literal(this.character.shortName()));
     }
 }

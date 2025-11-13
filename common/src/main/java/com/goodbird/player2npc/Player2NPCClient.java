@@ -5,6 +5,7 @@
 
 package com.goodbird.player2npc;
 
+import com.goodbird.player2npc.companion.AutomatoneEntity;
 import com.goodbird.player2npc.client.gui.CharacterSelectionScreen;
 import com.goodbird.player2npc.client.render.RenderAutomaton;
 import com.goodbird.player2npc.client.util.ClientPersistence;
@@ -67,9 +68,9 @@ public class Player2NPCClient {
                         Component.literal(PlayerEngineClient.enabledTTS ? "Enabled TTS" : "Disabled TTS"));
             }
             if (sttKeybind.isDown()) {
-                STTUtils.isListening = true;
+                STTUtils.setIsListening(true, AutomatoneEntity.PLAYER2_GAME_ID);
             } else {
-                STTUtils.isListening = false;
+                STTUtils.setIsListening(false, AutomatoneEntity.PLAYER2_GAME_ID);
             }
         });
         ClientTickEvent.CLIENT_PRE.register((client) -> {
